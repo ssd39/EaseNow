@@ -1,0 +1,29 @@
+{
+  "name": "smart-contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy-local": "npx hardhat ignition deploy ./ignition/modules/EaseNow.js --network hardhat",
+    "build": "solc --abi --bin --include-path node_modules/ --base-path . ./contracts/EaseNow.sol -o build",
+    "abigen": "./abigen --bin=./build/EaseNow.bin --abi=./build/EaseNow.abi --pkg=EaseNow --out=../core/easeNow/EaseNow.go"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/ssd39/easenow/smart-contracts"
+  },
+  "keywords": [
+    "base",
+    "solidity",
+    "hardhat"
+  ],
+  "author": "dwij patel (ssd39)",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2"
+  }
+}
