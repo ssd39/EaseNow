@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-var ChainId int64 = 1337
+var ChainId int64 = 31337
 
 func GetEthClient() (*ethclient.Client, error) {
 	client, err := ethclient.Dial("http://127.0.0.1:8545")

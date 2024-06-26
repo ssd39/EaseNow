@@ -13,7 +13,8 @@ func main() {
 		Name:  "easenow-core",
 		Usage: "TEE core layer of protocol",
 		Action: func(cCtx *cli.Context) error {
-			_, err := app.Init("/data/.seed")
+			seed, err := app.Init("/data/.seed")
+			app.StartApi(seed)
 			return err
 		},
 	}

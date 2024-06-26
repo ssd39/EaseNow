@@ -6,10 +6,10 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EaseNow is ERC20, Ownable {
     uint256 initialSupply = 10000;
-    bytes32 seedProof;
+    string public seedProof;
     //gets updated by TEE seed server at every minuite else if price ratio changed  more then threshold amount
     // ENT/ETH
-    uint256 priceRatio = 1;
+    uint256 public priceRatio = 1;
 
     // in this test version repayment cycle / locktime is 2min to easily test things out
     // in real world it can be 2weeks / 1month etc
@@ -42,14 +42,14 @@ contract EaseNow is ERC20, Ownable {
 
     receive() external payable {}
 
-    function init(bytes32 seedProof_) external {
-        require(seedProof == bytes32(0), "Already initialised!");
+    function init(string memory seedProof_) external {
+        require(bytes(seedProof).length == 0, "Already initialised!");
         seedProof = seedProof_;
         _transferOwnership(msg.sender);
     }
 
     function updatePriceRatio(uint256 newPriceRatio) external  onlyOwner {
-        require(seedProof != bytes32(0), "Core not intialised yet!");
+        require(bytes(seedProof).length != 0, "Core not intialised yet!");
         priceRatio = newPriceRatio;
     }
 
