@@ -6,7 +6,8 @@
   "scripts": {
     "deploy-local": "npx hardhat ignition deploy ./ignition/modules/EaseNow.js --network local",
     "build": "solc --abi --bin --include-path node_modules/ --base-path . ./contracts/EaseNow.sol -o build --overwrite",
-    "abigen": "./abigen --bin=./build/EaseNow.bin --abi=./build/EaseNow.abi --pkg=EaseNow --out=../core/easeNow/EaseNow.go"
+    "abigen": "./abigen --bin=./build/EaseNow.bin --abi=./build/EaseNow.abi --pkg=EaseNow --out=../core/easeNow/EaseNow.go",
+    "start-node": "npx hardhat node --hostname 0.0.0.0"
   },
   "repository": {
     "type": "git",

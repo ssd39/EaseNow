@@ -25,8 +25,8 @@ func StartApi(seed_ *helper.Seed) error {
 	r.HandleFunc("/register-finalise", registerFinalise).Methods("POST")
 
 	// Bind to a port and pass our router in
-	Logger.Info("Started api on 8000")
-	return http.ListenAndServe(":8000", r)
+	Logger.Info("Started api on 4000")
+	return http.ListenAndServe(":4000", r)
 }
 
 func registerStart(w http.ResponseWriter, r *http.Request) {
