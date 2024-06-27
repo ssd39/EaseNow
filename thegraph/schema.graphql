@@ -1,0 +1,86 @@
+type AmountRepaid @entity(immutable: true) {
+  id: Bytes!
+  userAddress: Bytes! # address
+  amount: BigInt! # uint256
+  remaingDebt: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  owner: Bytes! # address
+  spender: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LenderDeposit @entity(immutable: true) {
+  id: Bytes!
+  lender: Bytes! # address
+  amount: BigInt! # uint256
+  locktime: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LenderRewarded @entity(immutable: true) {
+  id: Bytes!
+  lender: Bytes! # address
+  rewardAmount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type LenderWithdraw @entity(immutable: true) {
+  id: Bytes!
+  lender: Bytes! # address
+  amount: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type OwnershipTransferred @entity(immutable: true) {
+  id: Bytes!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  from: Bytes! # address
+  to: Bytes! # address
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UserDefaulted @entity(immutable: true) {
+  id: Bytes!
+  userAddress: Bytes! # address
+  defaultAmount: BigInt! # uint256
+  privareData: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type UserRegistred @entity(immutable: true) {
+  id: Bytes!
+  userAddress: Bytes! # address
+  privateData: Bytes! # bytes32
+  creditLimit: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

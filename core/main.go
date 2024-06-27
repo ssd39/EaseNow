@@ -14,8 +14,10 @@ func main() {
 		Usage: "TEE core layer of protocol",
 		Action: func(cCtx *cli.Context) error {
 			seed, err := app.Init("/data/.seed")
-			app.StartApi(seed)
-			return err
+			if err != nil {
+				return err
+			}
+			return app.StartApi(seed)
 		},
 	}
 

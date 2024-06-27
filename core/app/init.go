@@ -33,7 +33,7 @@ func Init(seedPath string) (*helper.Seed, error) {
 		input := bufio.NewScanner(os.Stdin)
 		input.Scan()
 
-		seed = &helper.Seed{PrivateKey: privateKey, WalletAddress: walletAddress}
+		seed = &helper.Seed{PrivateKey: privateKey, WalletAddress: walletAddress, PrivateKeyBytes: privateKeyBytes}
 	} else {
 		privateKey, err := crypto.HexToECDSA(hexutil.Encode(privateKeyBytes)[2:])
 		if err != nil {
@@ -44,7 +44,7 @@ func Init(seedPath string) (*helper.Seed, error) {
 			return nil, err
 		}
 		Logger.Info("Wallet address: " + walletAddress)
-		seed = &helper.Seed{PrivateKey: privateKey, WalletAddress: walletAddress}
+		seed = &helper.Seed{PrivateKey: privateKey, WalletAddress: walletAddress, PrivateKeyBytes: privateKeyBytes}
 	}
 	client, err := helper.GetEthClient()
 	if err != nil {

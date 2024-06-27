@@ -43,3 +43,8 @@ func GetWalletAddress(privateKey *ecdsa.PrivateKey) (string, error) {
 	address := crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
 	return address, nil
 }
+
+func GetWalletAddressFromPubKey(publicKeyECDSA *ecdsa.PublicKey) string {
+	address := crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
+	return address
+}

@@ -89,7 +89,7 @@ contract EaseNow is ERC20, Ownable {
         }
     }
 
-    function borrow(uint256 amount, bytes32 purchaseData, address user) external onlyOwner {
+    function borrow(uint256 amount,  address user) external  {
         // this will be kind of proxy wallet thing, so contract pays the money and fees. 
         // or for easy way two steps tranasaction neeeds to done
         // first core withdraw require money and then does the payment related transaction
@@ -125,5 +125,5 @@ contract EaseNow is ERC20, Ownable {
         // currently charges are fixed to 1.5% of amount but in future it will auto adjust based on treasury
         // for example if some one defaults something to recover it smart contract will auto adjust
         return (((amount * currentPrice * 15)/1000) * (currentBlock - lockTime)) / 60;
-    }
+    } 
 }
