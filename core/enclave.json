@@ -15,5 +15,14 @@
     }
   ],
   "env": null,
-  "files": null
+  "files": [
+    {
+      "source": "./certs/ipfs-server.pem",
+      "target": "/etc/ssl/certs/ipfs-server.crt"
+    },
+    {
+      "source": "./certs/base-org.pem",
+      "target": "/etc/ssl/certs/base-org.crt"
+    }
+  ]
 }

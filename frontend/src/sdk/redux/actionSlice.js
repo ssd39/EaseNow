@@ -6,7 +6,7 @@ import {
 } from "@apollo/client";
 
 const client = new ApolloClient({
-  uri: "http://localhost:8000/subgraphs/name/easenow",
+  uri: "https://api.studio.thegraph.com/query/76928/easenow/v0.1",
   cache: new InMemoryCache(),
 });
 

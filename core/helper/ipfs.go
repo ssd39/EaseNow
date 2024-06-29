@@ -2,7 +2,6 @@ package helper
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,7 +12,6 @@ type IpfsUploadResposne struct {
 }
 
 func UploadDataToIpfs(data []byte) (string, error) {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	jsonBody := []byte(fmt.Sprintf(`{"code": "%s"}`, string(data)))
 	bodyReader := bytes.NewReader(jsonBody)
 	req, err := http.NewRequest(http.MethodPost, "https://explorer.litprotocol.com/api/pinata/upload", bodyReader)

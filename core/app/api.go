@@ -24,6 +24,7 @@ func StartApi(seed_ *helper.Seed) error {
 	r.HandleFunc("/register-start", registerStart).Methods("POST")
 	r.HandleFunc("/register-validate", registerValidateOtp).Methods("POST")
 	r.HandleFunc("/register-finalise", registerFinalise).Methods("POST")
+	r.HandleFunc("/faucet", faucet).Methods("POST")
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -134,6 +135,47 @@ func registerFinalise(w http.ResponseWriter, r *http.Request) {
 
 	res := RegisterFinaliseResponse{TxHash: tx.Hash().Hex(), Success: true}
 	WriteJsonResponse(&w, http.StatusOK, &res)
+}
+
+// test-net and mvp only
+func faucet(w http.ResponseWriter, r *http.Request) {
+	var payload FaucetPyaload
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&payload); err != nil || payload.Address == "" {
+		WriteBadReq(&w, "Please provide address!")
+		return
+	}
+	client, err := helper.GetEthClient()
+	if err != nil {
+		Logger.Error("Failed to get eth client", "error", err)
+		WriteBadReq(&w, "Internal server error!")
+		return
+	}
+
+	auth, err := helper.GetAuth(seed)
+	if err != nil {
+		Logger.Error("Failed to get internal wallet auth", "error", err)
+		WriteBadReq(&w, "Internal server error!")
+		return
+	}
+
+	instance, err := EaseNow.NewEaseNow(EaseNow.ContractAddress, client)
+	if err != nil {
+		Logger.Error("Error while getting cotract instance!", "error", err)
+		WriteBadReq(&w, "Internal server error!")
+		return
+	}
+
+	tx, err := instance.Faucet(auth, common.HexToAddress(payload.Address))
+	if err != nil {
+		Logger.Error("Failed to send test tokens!", "error", err)
+		WriteBadReq(&w, "Faucet TX failed!")
+		return
+	}
+	WriteJsonResponse(&w, http.StatusOK, FaucetResponse{
+		Success: true,
+		TxHash:  tx.Hash().Hex(),
+	})
 }
 
 func WriteBadReq(w *http.ResponseWriter, message string) {

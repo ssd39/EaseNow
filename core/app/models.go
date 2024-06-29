@@ -34,14 +34,13 @@ type RegisterFinaliseResponse struct {
 	//AuthToken string `json:"auth_token"`
 }
 
-type LoginPayload struct {
-	WalletAddress string `json:"wallet_address"`
-	WalletAuth    string `json:"wallet_auth"`
+type FaucetPyaload struct {
+	Address string `json:"address"`
 }
 
-type LoginResponse struct {
-	Success   bool   `json:"success"`
-	AuthToken string `json:"auth_token"`
+type FaucetResponse struct {
+	Success bool   `json:"success"`
+	TxHash  string `json:"tx_hash"`
 }
 
 type UserTempModel struct {
