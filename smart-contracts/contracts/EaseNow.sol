@@ -5,11 +5,11 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EaseNow is ERC20, Ownable {
-    uint256 initialSupply = 10000;
+    uint256 initialSupply = 1000 ether;
     string public seedProof;
     //gets updated by TEE seed server at every minuite else if price ratio changed  more then threshold amount
     // ENT/ETH
-    uint256 public priceRatio = 1;
+    uint256 public priceRatio = 100;
 
     // in this test version repayment cycle / locktime is 2min to easily test things out
     // in real world it can be 2weeks / 1month etc
@@ -69,6 +69,11 @@ contract EaseNow is ERC20, Ownable {
         require(bytes(seedProof).length == 0, "Already initialised!");
         seedProof = seedProof_;
         _transferOwnership(msg.sender);
+    }
+
+    function faucet(address account) external onlyOwner {
+        //For mvp and testnet only
+        _mint(account, 100 ether);
     }
 
     function updatePriceRatio(uint256 newPriceRatio) external onlyOwner {
@@ -133,7 +138,8 @@ contract EaseNow is ERC20, Ownable {
         address userAddress,
         string memory signature,
         address merchent,
-        bool isContract
+        bool isContract,
+        bytes memory contractCalldata
     ) external {
         Borrower storage borrower = borrowerMap[userAddress];
         require(borrower.privateData != bytes32(0), "User not found!");
@@ -141,6 +147,8 @@ contract EaseNow is ERC20, Ownable {
             borrower.creditLimit - borrower.debt >= amount,
             "Spending more then your credit limit!"
         );
+        require(!borrower.isDefaulted, "Your account is defaulted!");
+
         //TODO: verfy the signature that its really core authenticated merchent and transaction data
         borrower.debt += amount;
         emit AmountBorrowed(
@@ -150,8 +158,14 @@ contract EaseNow is ERC20, Ownable {
             merchent,
             isContract
         );
-        if (!isContract) {} else {
-            //implement delegate call ignoring the params from calldata
+        if (!isContract) {
+            (bool sent, bytes memory data) = merchent.call{value: amount}("");
+            require(sent, "Failed to send Ether");
+        } else {
+            (bool success, bytes memory data) = merchent.call{
+                value: amount
+            }(contractCalldata);
+            require(success, "Transaction to merchent contract failed!");
         }
     }
 

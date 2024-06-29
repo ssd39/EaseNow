@@ -1,6 +1,7 @@
 import { newMockEvent } from "matchstick-as"
 import { ethereum, Address, BigInt, Bytes } from "@graphprotocol/graph-ts"
 import {
+  AmountBorrowed,
   AmountRepaid,
   Approval,
   LenderDeposit,
@@ -11,6 +12,45 @@ import {
   UserDefaulted,
   UserRegistred
 } from "../generated/EaseNow/EaseNow"
+
+export function createAmountBorrowedEvent(
+  userAddress: Address,
+  amount: BigInt,
+  remainingLimit: BigInt,
+  merchent: Address,
+  isContract: boolean
+): AmountBorrowed {
+  let amountBorrowedEvent = changetype<AmountBorrowed>(newMockEvent())
+
+  amountBorrowedEvent.parameters = new Array()
+
+  amountBorrowedEvent.parameters.push(
+    new ethereum.EventParam(
+      "userAddress",
+      ethereum.Value.fromAddress(userAddress)
+    )
+  )
+  amountBorrowedEvent.parameters.push(
+    new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
+  )
+  amountBorrowedEvent.parameters.push(
+    new ethereum.EventParam(
+      "remainingLimit",
+      ethereum.Value.fromUnsignedBigInt(remainingLimit)
+    )
+  )
+  amountBorrowedEvent.parameters.push(
+    new ethereum.EventParam("merchent", ethereum.Value.fromAddress(merchent))
+  )
+  amountBorrowedEvent.parameters.push(
+    new ethereum.EventParam(
+      "isContract",
+      ethereum.Value.fromBoolean(isContract)
+    )
+  )
+
+  return amountBorrowedEvent
+}
 
 export function createAmountRepaidEvent(
   userAddress: Address,

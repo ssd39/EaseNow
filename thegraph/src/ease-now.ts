@@ -1,4 +1,5 @@
 import {
+  AmountBorrowed as AmountBorrowedEvent,
   AmountRepaid as AmountRepaidEvent,
   Approval as ApprovalEvent,
   LenderDeposit as LenderDepositEvent,
@@ -10,6 +11,7 @@ import {
   UserRegistred as UserRegistredEvent
 } from "../generated/EaseNow/EaseNow"
 import {
+  AmountBorrowed,
   AmountRepaid,
   Approval,
   LenderDeposit,
@@ -20,6 +22,23 @@ import {
   UserDefaulted,
   UserRegistred
 } from "../generated/schema"
+
+export function handleAmountBorrowed(event: AmountBorrowedEvent): void {
+  let entity = new AmountBorrowed(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.userAddress = event.params.userAddress
+  entity.amount = event.params.amount
+  entity.remainingLimit = event.params.remainingLimit
+  entity.merchent = event.params.merchent
+  entity.isContract = event.params.isContract
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
 
 export function handleAmountRepaid(event: AmountRepaidEvent): void {
   let entity = new AmountRepaid(

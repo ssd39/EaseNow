@@ -6,16 +6,17 @@ schema:
 dataSources:
   - kind: ethereum
     name: EaseNow
-    network: mainnet
+    network: base-sepolia
     source:
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+      address: "0x19b4A03e9BDe9F0bf3B6f5E4398B5EABCDaC6DEC"
       abi: EaseNow
-      startBlock: 0
+      startBlock: 11940667
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
+        - AmountBorrowed
         - AmountRepaid
         - Approval
         - LenderDeposit
@@ -29,22 +30,24 @@ dataSources:
         - name: EaseNow
           file: ./abis/EaseNow.json
       eventHandlers:
-        - event: AmountRepaid(address,uint256,uint256)
+        - event: AmountBorrowed(indexed address,uint256,uint256,address,bool)
+          handler: handleAmountBorrowed
+        - event: AmountRepaid(indexed address,uint256,uint256)
           handler: handleAmountRepaid
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
-        - event: LenderDeposit(address,uint256,uint256)
+        - event: LenderDeposit(indexed address,uint256,uint256)
           handler: handleLenderDeposit
-        - event: LenderRewarded(address,uint256)
+        - event: LenderRewarded(indexed address,uint256)
           handler: handleLenderRewarded
-        - event: LenderWithdraw(address,uint256)
+        - event: LenderWithdraw(indexed address,uint256)
           handler: handleLenderWithdraw
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: UserDefaulted(address,uint256,bytes32)
+        - event: UserDefaulted(indexed address,uint256,bytes32)
           handler: handleUserDefaulted
-        - event: UserRegistred(address,bytes32,uint256)
+        - event: UserRegistred(indexed address,bytes32,uint256)
           handler: handleUserRegistred
       file: ./src/ease-now.ts

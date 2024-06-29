@@ -1,8 +1,8 @@
 {
-  "mainnet": {
+  "base-sepolia": {
     "EaseNow": {
-      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-      "startBlock": 0
+      "address": "0x19b4A03e9BDe9F0bf3B6f5E4398B5EABCDaC6DEC",
+      "startBlock": 11940667
     }
   }
 }

@@ -15,7 +15,7 @@ import (
 var ChainId int64 = 31337
 
 func GetEthClient() (*ethclient.Client, error) {
-	client, err := ethclient.Dial("http://127.0.0.1:8545")
+	client, err := ethclient.Dial("https://sepolia.base.org")
 	if err != nil {
 		return nil, err
 	}

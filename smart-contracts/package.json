@@ -7,7 +7,8 @@
     "deploy-local": "npx hardhat ignition deploy ./ignition/modules/EaseNow.js --network local",
     "build": "solc --abi --bin --include-path node_modules/ --base-path . ./contracts/EaseNow.sol -o build --overwrite",
     "abigen": "./abigen --bin=./build/EaseNow.bin --abi=./build/EaseNow.abi --pkg=EaseNow --out=../core/easeNow/EaseNow.go",
-    "start-node": "npx hardhat node --hostname 0.0.0.0"
+    "start-node": "npx hardhat node --hostname 0.0.0.0",
+    "deploy-base": "npx hardhat ignition deploy ./ignition/modules/EaseNow.js --network base-sepolia"
   },
   "repository": {
     "type": "git",
@@ -25,6 +26,7 @@
     "hardhat": "^2.22.5"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.2"
+    "@openzeppelin/contracts": "^5.0.2",
+    "dotenv": "^16.4.5"
   }
 }
