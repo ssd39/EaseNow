@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"github.com/spruceid/siwe-go"
 	EaseNow "github.com/ssd39/easenow/core/easeNow"
 	"github.com/ssd39/easenow/core/helper"
@@ -24,9 +25,14 @@ func StartApi(seed_ *helper.Seed) error {
 	r.HandleFunc("/register-validate", registerValidateOtp).Methods("POST")
 	r.HandleFunc("/register-finalise", registerFinalise).Methods("POST")
 
-	// Bind to a port and pass our router in
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
+
+	handler := c.Handler(r)
 	Logger.Info("Started api on 4000")
-	return http.ListenAndServe(":4000", r)
+	return http.ListenAndServe(":4000", handler)
 }
 
 func registerStart(w http.ResponseWriter, r *http.Request) {
@@ -63,7 +69,7 @@ func registerValidateOtp(w http.ResponseWriter, r *http.Request) {
 	userTempData.CreditLimit = helper.EtherToWei(big.NewFloat(float64(helper.RandRange(1, 4)) - ((float64(helper.RandRange(1, 9)) / 10) * float64(helper.RandRange(0, 2)))))
 	tempUserMap[payload.SessionId] = userTempData
 	res := RegisterValidateResponse{
-		CreditLimit: userTempData.CreditLimit,
+		CreditLimit: userTempData.CreditLimit.String(),
 		Success:     true,
 	}
 	WriteJsonResponse(&w, http.StatusOK, &res)
@@ -72,14 +78,8 @@ func registerValidateOtp(w http.ResponseWriter, r *http.Request) {
 func registerFinalise(w http.ResponseWriter, r *http.Request) {
 	var payload RegisterFinalisePayload
 	decoder := json.NewDecoder(r.Body)
-	if err := decoder.Decode(&payload); err != nil || payload.SessionId == "" {
+	if err := decoder.Decode(&payload); err != nil || payload.WalletMessage == "" || payload.WalletSignature == "" || payload.PrivateData == "" {
 		WriteBadReq(&w, "Please fill all details!")
-		return
-	}
-	// here use the facial data and private data to confirm the person and if things gets confirmed store them on-chain
-	userTempData, ok := tempUserMap[payload.SessionId]
-	if !ok {
-		WriteBadReq(&w, "Session not found!")
 		return
 	}
 
@@ -95,10 +95,13 @@ func registerFinalise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if message.GetNonce() != payload.SessionId {
-		WriteBadReq(&w, "Wrong session id provided!")
+	// here use the facial data and private data to confirm the person and if things gets confirmed store them on-chain
+	userTempData, ok := tempUserMap[message.GetNonce()]
+	if !ok {
+		WriteBadReq(&w, "Session not found!")
 		return
 	}
+	defer delete(tempUserMap, message.GetNonce())
 
 	walletAddress := helper.GetWalletAddressFromPubKey(publicKey)
 

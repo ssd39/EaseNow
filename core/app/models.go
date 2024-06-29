@@ -18,13 +18,11 @@ type RegisterValidatePayload struct {
 }
 
 type RegisterValidateResponse struct {
-	CreditLimit *big.Int `json:"credit_limit"`
-	Success     bool     `json:"success"`
+	CreditLimit string `json:"credit_limit"`
+	Success     bool   `json:"success"`
 }
 
 type RegisterFinalisePayload struct {
-	SessionId       string `json:"session_id"`
-	EmailId         string `json:"email_id"`
 	PrivateData     string `json:"private_data"`
 	WalletMessage   string `json:"wallet_message"`
 	WalletSignature string `json:"wallet_sig"`

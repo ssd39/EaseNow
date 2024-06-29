@@ -41,6 +41,7 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/relvacode/iso8601 v1.4.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
+	github.com/rs/cors v1.11.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect
 	github.com/spruceid/siwe-go v0.2.1 // indirect
