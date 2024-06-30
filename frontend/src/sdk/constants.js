@@ -4,3 +4,4 @@ export const coinbaseSmartWalletProxyBytecode =
 export const contractAddr = "0xc2e5405853a414d2035725a572399b089Fe2F2CC";
 export const theGraphApi =
   "https://api.studio.thegraph.com/query/76928/easenow/v0.5";
+export const coreGateway = "https://easenow.ddlmovies.online"

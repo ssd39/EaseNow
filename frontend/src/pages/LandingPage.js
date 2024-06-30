@@ -33,7 +33,7 @@ export default function LandingPage() {
             className="h-[150px] w-[560px] g1bg rounded-lg p-4 flex flex-col justify-center cursor-pointer active:scale-90 select-none"
           >
             <span className="text-white text-3xl font-semibold">
-              Manage Your Credits >
+              Manage Your Credits {">"}
             </span>
             <span className="text-orange-200">
               A dashboard to mange your credit usage and repay the debt
@@ -44,7 +44,7 @@ export default function LandingPage() {
             className="h-[150px] w-[560px] g2bg rounded-lg p-4 flex flex-col mt-4 justify-center cursor-pointer active:scale-90 select-none"
           >
             <span className="text-white text-3xl font-semibold">
-              Demo Shop >
+              Demo Shop {">"}
             </span>
             <span className="text-orange-200">
               A demo shop to witness magical experience by paying using
@@ -53,7 +53,7 @@ export default function LandingPage() {
           </div>
           <div   onClick={() => alert("Under development. Comming soon!")} className="h-[150px] w-[560px] g3bg rounded-lg p-4 flex flex-col mt-4 justify-center cursor-pointer active:scale-90 select-none">
             <span className="text-white text-3xl font-semibold">
-              Earn Extra By Lending >
+              Earn Extra By Lending {">"}
             </span>
             <span className="text-orange-200">
               EaseNow⚡ is backed by the smart DeFI protocol, Be part of it and
@@ -62,7 +62,7 @@ export default function LandingPage() {
           </div>
           <div onClick={() => alert("Under development. Comming soon!")} className="h-[150px] w-[560px] g4bg rounded-lg p-4 flex flex-col mt-4 justify-center cursor-pointer active:scale-90 select-none">
             <span className="text-white text-3xl font-semibold">
-              Check Public Credit Records >
+              Check Public Credit Records {">"}
             </span>
             <span className="text-orange-200">
               The private data of users unable to pay their debts is decrypted

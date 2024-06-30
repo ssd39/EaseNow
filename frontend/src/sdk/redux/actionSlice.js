@@ -33,9 +33,6 @@ const fetchUser = createAsyncThunk(
         creditLimit: 0
       }
     }
-
-
-
     return { isNewUser: false, creditLimit: result.data.userRegistreds[0].creditLimit};
   }
 );

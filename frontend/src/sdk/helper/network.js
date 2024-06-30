@@ -1,7 +1,8 @@
+import { coreGateway } from "../constants";
 import { toastError } from "./toast-helper"
 import { ethers } from "ethers";
 
-const api = "http://localhost:4000"
+const api =  coreGateway
 
 const registerStart = async (phone_number, country_code) => {
     const res = await (await fetch(api + "/register-start", {
