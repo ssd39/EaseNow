@@ -53,7 +53,7 @@ const registerFinalise = async (message, signature, ipfsHash) => {
         })
     })).json()
     if(res.success){
-        return wieToEthStr(res.tx_hash)
+        return res.tx_hash
     }
     toastError(res.message)
     return ""
@@ -62,11 +62,12 @@ const registerFinalise = async (message, signature, ipfsHash) => {
 function wieToEthStr(wieNum) {
     const res = ethers.formatEther(wieNum)
     const parts = res.split(".")
-    return parts[0] + "." + parts[1].slice(0, 2)
+    return parts[0] + "." + parts[1].slice(0, 3)
 }
 
 export {
     registerStart,
     registerValidate,
-    registerFinalise
+    registerFinalise,
+    wieToEthStr
 }

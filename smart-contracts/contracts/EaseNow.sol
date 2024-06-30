@@ -26,8 +26,8 @@ contract EaseNow is ERC20, Ownable {
         uint256 amount;
     }
 
-    mapping(address => Borrower) borrowerMap;
-    mapping(address => Lender) lenderMap;
+    mapping(address => Borrower) public borrowerMap;
+    mapping(address => Lender) public lenderMap;
 
     event LenderWithdraw(address indexed lender, uint256 amount);
     event LenderDeposit(
@@ -59,8 +59,8 @@ contract EaseNow is ERC20, Ownable {
         bool isContract
     );
 
-    constructor() Ownable(msg.sender) ERC20("EaseToken", "ENT") {
-        _mint(msg.sender, initialSupply);
+    constructor() Ownable(tx.origin) ERC20("EaseToken", "ENT") {
+        _mint(tx.origin, initialSupply);
     }
 
     receive() external payable {}
@@ -68,7 +68,7 @@ contract EaseNow is ERC20, Ownable {
     function init(string memory seedProof_) external {
         require(bytes(seedProof).length == 0, "Already initialised!");
         seedProof = seedProof_;
-        _transferOwnership(msg.sender);
+        _transferOwnership(tx.origin);
     }
 
     function faucet(address account) external onlyOwner {
@@ -82,7 +82,7 @@ contract EaseNow is ERC20, Ownable {
     }
 
     function deposit() external payable {
-        Lender storage lender = lenderMap[msg.sender];
+        Lender storage lender = lenderMap[tx.origin];
         // first settle down unpaid rewards
         uint256 reward = getRewardAmount(
             lender.lockTime,
@@ -91,16 +91,16 @@ contract EaseNow is ERC20, Ownable {
             priceRatio
         );
         if (reward != 0) {
-            _mint(msg.sender, reward);
-            emit LenderRewarded(msg.sender, reward);
+            _mint(tx.origin, reward);
+            emit LenderRewarded(tx.origin, reward);
         }
         lender.amount += msg.value;
         lender.lockTime = block.number;
-        emit LenderDeposit(msg.sender, msg.value, lender.lockTime);
+        emit LenderDeposit(tx.origin, msg.value, lender.lockTime);
     }
 
     function withdraw(uint256 amount) external {
-        Lender storage lender = lenderMap[msg.sender];
+        Lender storage lender = lenderMap[tx.origin];
         require(
             lender.amount >= amount,
             "Can't withdraw more then your balance!"
@@ -117,31 +117,30 @@ contract EaseNow is ERC20, Ownable {
             priceRatio
         );
         if (reward != 0) {
-            _mint(msg.sender, reward);
-            emit LenderRewarded(msg.sender, reward);
+            _mint(tx.origin, reward);
+            emit LenderRewarded(tx.origin, reward);
         }
         lender.amount -= amount;
-        emit LenderWithdraw(msg.sender, amount);
+        emit LenderWithdraw(tx.origin, amount);
         if (address(this).balance < amount) {
             uint256 missingAmount = amount - address(this).balance;
-            _mint(msg.sender, missingAmount * priceRatio);
+            _mint(tx.origin, missingAmount * priceRatio);
             amount = address(this).balance;
         }
         if (amount > 0) {
-            (bool sent, bytes memory data) = msg.sender.call{value: amount}("");
+            (bool sent, bytes memory data) = tx.origin.call{value: amount}("");
             require(sent, "Failed to withdraw!");
         }
     }
 
     function borrow(
         uint256 amount,
-        address userAddress,
         string memory signature,
         address merchent,
         bool isContract,
         bytes memory contractCalldata
     ) external {
-        Borrower storage borrower = borrowerMap[userAddress];
+        Borrower storage borrower = borrowerMap[msg.sender];
         require(borrower.privateData != bytes32(0), "User not found!");
         require(
             borrower.creditLimit - borrower.debt >= amount,
@@ -152,7 +151,7 @@ contract EaseNow is ERC20, Ownable {
         //TODO: verfy the signature that its really core authenticated merchent and transaction data
         borrower.debt += amount;
         emit AmountBorrowed(
-            userAddress,
+            msg.sender,
             amount,
             borrower.creditLimit - borrower.debt,
             merchent,
@@ -162,28 +161,28 @@ contract EaseNow is ERC20, Ownable {
             (bool sent, bytes memory data) = merchent.call{value: amount}("");
             require(sent, "Failed to send Ether");
         } else {
-            (bool success, bytes memory data) = merchent.call{
-                value: amount
-            }(contractCalldata);
+            (bool success, bytes memory data) = merchent.call{value: amount}(
+                contractCalldata
+            );
             require(success, "Transaction to merchent contract failed!");
         }
     }
 
     function repay() external payable {
-        Borrower storage borrower = borrowerMap[msg.sender];
+        Borrower storage borrower = borrowerMap[tx.origin];
         require(
             msg.value >= borrower.debt,
             "You are paying more then your debt amount"
         );
         uint256 fees = getRewardAmount(0, msg.value, 60, priceRatio);
-        require(balanceOf(msg.sender) >= fees, "Not enough ENT to pay fees");
-        _burn(msg.sender, fees);
+        require(balanceOf(tx.origin) >= fees, "Not enough ENT to pay fees");
+        _burn(tx.origin, fees);
         borrower.debt -= msg.value;
-        emit AmountRepaid(msg.sender, msg.value, borrower.debt);
+        emit AmountRepaid(tx.origin, msg.value, borrower.debt);
     }
 
     function reportDefault(address userAddress) external {
-        Borrower storage borrower = borrowerMap[msg.sender];
+        Borrower storage borrower = borrowerMap[tx.origin];
         require(!borrower.isDefaulted, "User already defaulted!");
         require(
             borrower.debt > 0 && borrower.lastPaymentTime + 90 <= block.number,
@@ -216,5 +215,15 @@ contract EaseNow is ERC20, Ownable {
         return
             (((amount * currentPrice * 15) / 1000) *
                 (currentBlock - lockTime)) / 60;
+    }
+
+    function getBorrowerData(
+        address user
+    ) public view returns (Borrower memory) {
+        return borrowerMap[user];
+    }
+
+    function getLenderData(address user) public view returns (Lender memory) {
+        return lenderMap[user];
     }
 }

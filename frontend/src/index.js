@@ -1,34 +1,47 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
 import {
   createBrowserRouter,
   RouterProvider,
   Route,
   Link,
 } from "react-router-dom";
-import TestShop from './pages/TestShop';
+import TestShop from "./pages/TestShop";
+import Account from "./pages/Account";
+import { config } from "./sdk/config";
+import { WagmiProvider } from "wagmi";
+import { ToastContainer } from "react-toastify";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import LandingPage from "./pages/LandingPage";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: (
-      <div>
-        <h1>Hello World</h1>
-        <Link to="about">About Us</Link>
-      </div>
-    ),
+    element: <LandingPage />,
   },
   {
     path: "test-shop",
     element: <TestShop />,
   },
+  {
+    path: "manage-account",
+    element: (
+      <WagmiProvider config={config}>
+        <ToastContainer />
+        <QueryClientProvider client={queryClient}>
+          <Account />
+        </QueryClientProvider>
+      </WagmiProvider>
+    ),
+  },
 ]);
 
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <RouterProvider router={router} />

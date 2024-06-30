@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"encoding/json"
 	"math/big"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/spruceid/siwe-go"
 	EaseNow "github.com/ssd39/easenow/core/easeNow"
 	"github.com/ssd39/easenow/core/helper"
+	"github.com/storyicon/sigverify"
 )
 
 var seed *helper.Seed
@@ -25,6 +27,10 @@ func StartApi(seed_ *helper.Seed) error {
 	r.HandleFunc("/register-validate", registerValidateOtp).Methods("POST")
 	r.HandleFunc("/register-finalise", registerFinalise).Methods("POST")
 	r.HandleFunc("/faucet", faucet).Methods("POST")
+
+	//TODO: need to implment following endpoint so any TEE can join the cluster and can import the .seed
+	// this all happens autonomously an no body can see the decrypted value of .seed apart from TEE
+	//r.HandleFunc("/join", joinCluster).Methods("POST")
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -84,16 +90,35 @@ func registerFinalise(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var message *siwe.Message
+	client, err := helper.GetEthClient()
+	if err != nil {
+		Logger.Error("Failed to get eth client", "error", err)
+		WriteBadReq(&w, "Internal server error!")
+		return
+	}
+
 	message, err := siwe.ParseMessage(payload.WalletMessage)
 	if err != nil {
 		WriteBadReq(&w, "Error while parsing siwe message!")
 		return
 	}
 	publicKey, err := message.VerifyEIP191(payload.WalletSignature)
+	isEip1271 := false
 	if err != nil {
-		WriteBadReq(&w, "Authentication failed!")
-		return
+		Logger.Error("EIP191  verification failed")
+		valid, err := sigverify.VerifyERC1271HexSignature(
+			context.Background(),
+			client,
+			message.GetAddress(),
+			helper.Eip191Hash(message).Bytes(),
+			payload.WalletSignature,
+		)
+		if !valid || err != nil {
+			Logger.Error("ERC1271  verification failed", "error", err)
+			//WriteBadReq(&w, "Authentication failed!")
+			//return
+		}
+		isEip1271 = true
 	}
 
 	// here use the facial data and private data to confirm the person and if things gets confirmed store them on-chain
@@ -104,13 +129,12 @@ func registerFinalise(w http.ResponseWriter, r *http.Request) {
 	}
 	defer delete(tempUserMap, message.GetNonce())
 
-	walletAddress := helper.GetWalletAddressFromPubKey(publicKey)
-
-	client, err := helper.GetEthClient()
-	if err != nil {
-		Logger.Error("Failed to get eth client", "error", err)
-		WriteBadReq(&w, "Internal server error!")
-		return
+	walletAddress := ""
+	if isEip1271 {
+		Logger.Info("SmartWallet Addr:", message.GetAddress().String())
+		walletAddress = message.GetAddress().String()
+	} else {
+		walletAddress = helper.GetWalletAddressFromPubKey(publicKey)
 	}
 
 	auth, err := helper.GetAuth(seed)

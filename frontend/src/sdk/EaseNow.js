@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import { WagmiProvider, useAccount } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Provider } from "react-redux";
+import { Provider, useDispatch } from "react-redux";
 import { config } from "./config";
 import { WalletOptions } from "./components/WalletOptions";
 import Header from "./components/Header";
@@ -10,12 +10,12 @@ import store from "./redux/store";
 import "./EaseNow.css";
 import Payment from "./components/Payment";
 import Registration from "./components/Registration";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const queryClient = new QueryClient();
 
-function ConnectWallet({ nextStage }) {
+export function ConnectWallet({ nextStage }) {
   const { isConnected } = useAccount();
   useEffect(() => {
     if (isConnected) {
@@ -25,8 +25,7 @@ function ConnectWallet({ nextStage }) {
   return <WalletOptions />;
 }
 
-export default function EaseNow({ handleClose }) {
-  const [isOpen, setOpen] = useState(true);
+export default function EaseNow({ isOpen,  handleClose, merchent, amount, title }) {
   const [stage, setStage] = useState(0);
 
   return (
@@ -49,7 +48,7 @@ export default function EaseNow({ handleClose }) {
             open={isOpen}
           >
             <div className="p-3 flex flex-col flex-1">
-              <Header onClose={() => setOpen(false)} />
+              <Header onClose={() => handleClose(false)} />
               {false && (
                 <div className="mt-6">
                   <span className="font-bold">
@@ -58,19 +57,29 @@ export default function EaseNow({ handleClose }) {
                 </div>
               )}
               <div className="flex flex-1">
-              {stage == 0 && (
-                <div className="flex flex-col">
-                  <div className="items-center justify-center flex mt-6">
-                    <img src="wallet.png" />
-                    <span className="text-2xl ml-1">Connect a wallet</span>
+                {stage == 0 && (
+                  <div className="flex flex-col w-full">
+                    <div className="items-center justify-center flex mt-6">
+                      <img src="wallet.png" />
+                      <span className="text-2xl ml-1">Connect a wallet</span>
+                    </div>
+                    <div className="mt-6">
+                      <ConnectWallet nextStage={() => setStage(1)} />
+                    </div>
                   </div>
-                  <div className="mt-6">
-                    <ConnectWallet nextStage={() => setStage(1)} />
-                  </div>
-                </div>
-              )}
-              {stage == 1 && <Payment nextStage={(id) => setStage(id)} />}
-              {stage == 2 && <Registration />}
+                )}
+                {stage == 1 && (
+                  <Payment
+                    onClose={() => handleClose(false)}
+                    merchent={merchent}
+                    amount={amount}
+                    title={title}
+                    nextStage={(id) => setStage(id)}
+                  />
+                )}
+                {stage == 2 && (
+                  <Registration nextStage={(id) => setStage(id)} />
+                )}
               </div>
             </div>
           </Dialog>

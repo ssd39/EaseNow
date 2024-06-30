@@ -8,7 +8,8 @@
     "build": "solc --abi --bin --include-path node_modules/ --base-path . ./contracts/EaseNow.sol -o build --overwrite",
     "abigen": "./abigen --bin=./build/EaseNow.bin --abi=./build/EaseNow.abi --pkg=EaseNow --out=../core/easeNow/EaseNow.go",
     "start-node": "npx hardhat node --hostname 0.0.0.0",
-    "deploy-base": "npx hardhat ignition deploy ./ignition/modules/EaseNow.js --network base-sepolia"
+    "deploy-base": "npx hardhat ignition deploy ./ignition/modules/EaseNow.js --network base-sepolia",
+    "deploy-base-testshop": "npx hardhat ignition deploy ./ignition/modules/TestShop.js --network base-sepolia"
   },
   "repository": {
     "type": "git",

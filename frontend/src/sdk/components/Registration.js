@@ -14,8 +14,10 @@ import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import { handleUpload } from "../helper/ipfs";
 import { useAccount, useSignMessage } from "wagmi";
 import { SiweMessage } from "siwe";
+import { useDispatch } from "react-redux";
+import { updateCreditLimit } from "../redux/actionSlice";
 
-export default function Registration() {
+export default function Registration({ nextStage }) {
   const [step, setStep] = useState(0);
   const [sessionId, setSessionId] = useState("");
   const [countryCode, setCountryCode] = useState("91");
@@ -31,11 +33,13 @@ export default function Registration() {
 
   const fileInputRef = useRef(null);
   const { address, chainId } = useAccount();
+  const dispatch = useDispatch()
 
   const { signMessageAsync } = useSignMessage();
 
   const handleFileChange = async (event) => {
     setUploaded(true);
+    //TODO: encrypt file before upload using ECDH
     const hash = await handleUpload(event.target.files[0]);
     setUploading(false);
     setIpfsHash(hash);
@@ -87,14 +91,16 @@ export default function Registration() {
           message: message.prepareMessage(),
         }).catch((e) => toastError("Failed to get signature!"));
         if (signature != "") {
-          await registerFinalise(message.prepareMessage(), signature, ipfsHash).then(
-            (txHash) => {
-              if (txHash != "") {
-                setTxHash(txHash);
-                setStep(3);
-              }
+          await registerFinalise(
+            message.prepareMessage(),
+            signature,
+            ipfsHash
+          ).then((txHash) => {
+            if (txHash != "") {
+              setTxHash(txHash);
+              setStep(3);
             }
-          );
+          });
         }
       } catch (e) {
         toastError("Network error!");
@@ -104,6 +110,13 @@ export default function Registration() {
     }
     setLoading(false);
   };
+
+  const step4 = async () => {
+    setLoading(true)
+    await dispatch(updateCreditLimit(creditLimit))
+    nextStage(1)
+    setLoading(false)
+  }
 
   return (
     <>
@@ -301,6 +314,31 @@ export default function Registration() {
               }}
             >
               Generate signature
+            </GButton>
+          </div>
+        </div>
+      )}
+      {step == 3 && (
+        <div className="mt-4 flex flex-col items-center w-full">
+          <span className="text-lg text-center">
+            You are all set! Your account created successfully ✅
+          </span>
+          <button
+            onClick={() => {
+              window.open(`https://base-sepolia.blockscout.com/tx/${txHash}`)
+            }}
+            className="bg-[#383838] hover:bg-[rgb(50,50,50)]  active:scale-90  rounded-lg  w-[80%] flex p-3 items-center justify-center mt-3"
+          >
+            Checkout on transaction explorer
+          </button>
+          <div className="flex-1 items-end flex mb-6">
+            <GButton
+              loading={loading}
+              onClick={async () => {
+                step4()
+              }}
+            >
+              Continue purchase
             </GButton>
           </div>
         </div>

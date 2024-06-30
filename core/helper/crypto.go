@@ -3,10 +3,13 @@ package helper
 import (
 	"crypto/ecdsa"
 	"errors"
+	"fmt"
 	"os"
 
 	"github.com/edgelesssys/ego/ecrypto"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/spruceid/siwe-go"
 )
 
 func SealKeyToFile(seed []byte, filePath string) error {
@@ -47,4 +50,11 @@ func GetWalletAddress(privateKey *ecdsa.PrivateKey) (string, error) {
 func GetWalletAddressFromPubKey(publicKeyECDSA *ecdsa.PublicKey) string {
 	address := crypto.PubkeyToAddress(*publicKeyECDSA).Hex()
 	return address
+}
+
+func Eip191Hash(m *siwe.Message) common.Hash {
+	// Ref: https://stackoverflow.com/questions/49085737/geth-ecrecover-invalid-signature-recovery-id
+	data := []byte(m.String())
+	msg := fmt.Sprintf("\x19Ethereum Signed Message:\n%d%s", len(data), data)
+	return crypto.Keccak256Hash([]byte(msg))
 }

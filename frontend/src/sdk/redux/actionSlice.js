@@ -4,9 +4,13 @@ import {
   InMemoryCache,
   gql,
 } from "@apollo/client";
+import { theGraphApi } from "../constants";
 
-const client = new ApolloClient({
-  uri: "https://api.studio.thegraph.com/query/76928/easenow/v0.1",
+
+
+export const client = new ApolloClient({
+  uri: theGraphApi
+  ,
   cache: new InMemoryCache(),
 });
 
@@ -29,6 +33,9 @@ const fetchUser = createAsyncThunk(
         creditLimit: 0
       }
     }
+
+
+
     return { isNewUser: false, creditLimit: result.data.userRegistreds[0].creditLimit};
   }
 );
@@ -39,8 +46,21 @@ export const actionSlice = createSlice({
     isNewUser: true,
     isUserFetched: false,
     creditLimit: 0,
+    amount: 0,
+    title: "",
+    merchent: ""
   },
-  reducers: {},
+  reducers: {
+    updateCreditLimit(state, action) {
+      state.isNewUser = false
+      state.creditLimit = action.payload
+    },
+    setTransactionData(state, action) {
+      state.title = action.payload.title
+      state.amount = action.payload.amount
+      state.merchent = action.payload.merchent
+    }
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchUser.fulfilled, (state, action) => {
       state.isNewUser = action.payload.isNewUser;
@@ -54,6 +74,6 @@ export const actionSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {} = actionSlice.actions;
+export const { updateCreditLimit, setTransactionData } = actionSlice.actions;
 export { fetchUser }
 export default actionSlice.reducer;
